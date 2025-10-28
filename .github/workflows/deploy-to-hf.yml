@@ -1,0 +1,29 @@
+name: Deploy to Hugging Face Space
+
+on:
+  push:
+    branches: [ main ]   # 你主分支叫 main 的話就用 main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set git identity
+        run: |
+          git config --global user.email "bot@users.noreply.github.com"
+          git config --global user.name  "GitHub Actions"
+
+      - name: Push to Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          # 你的 Space，要改成自己的命名空間與專案名
+          HF_SPACE_REPO="https://lyh26x03:${HF_TOKEN}@huggingface.co/spaces/lyh26x03/gemiline"
+
+          # 初始化一個暫時的 remote，直接 mirror 到 HF
+          git remote add hf "$HF_SPACE_REPO" || true
+          # 確保把 GitHub 的 main 推上去（如果你是別的分支改這裡）
+          git push hf HEAD:main --force
