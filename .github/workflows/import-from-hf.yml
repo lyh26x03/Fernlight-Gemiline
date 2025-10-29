@@ -1,0 +1,29 @@
+name: Import from Hugging Face Space
+on:
+  workflow_dispatch:   # 只手動觸發，避免誤動作
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - name: Configure git
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "github-actions[bot]"
+
+      - name: Pull Space into this repo (merge histories)
+        env:
+          HF_SPACE:  ${{ secrets.HF_SPACE }}          # 例：lyh26x03/gemiline
+          HF_TOKEN:  ${{ secrets.HF_TOKEN }}
+          HF_BRANCH: ${{ secrets.HF_SPACE_BRANCH }}   # 通常 main
+        run: |
+          set -e
+          git remote add space "https://user:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE}.git"
+          git fetch space "${HF_BRANCH}"
+          # 允許無關歷史，將 HF 內容合併進來
+          git pull --allow-unrelated-histories space "${HF_BRANCH}" || \
+            git merge --allow-unrelated-histories "space/${HF_BRANCH}" -m "Import from HF"
+          git push origin HEAD
