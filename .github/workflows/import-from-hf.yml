@@ -1,0 +1,30 @@
+name: Import from Hugging Face Space
+
+on:
+  workflow_dispatch:  # 手動觸發
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # 允許把更新推回這個 GitHub repo
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Pull HF Space into this repo (keep .github/)
+        shell: bash
+        run: |
+          set -euxo pipefail
+          rm -rf /tmp/hfspace
+          # 從你的 HF Space 取得檔案；HF_SPACE 你已經設成 lyh26x03/gemiline 了
+          git clone --depth 1 "https://huggingface.co/spaces/${{ secrets.HF_SPACE }}" /tmp/hfspace
+          # 複製檔案回目前 repo，保留 .github/（避免把 workflow 自己洗掉）
+          rsync -a --delete --exclude='.git' --exclude='.github/' /tmp/hfspace/ .
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git add -A
+          git commit -m "Import from HF Space: ${{ secrets.HF_SPACE }}" || echo "Nothing to commit"
+          git push
