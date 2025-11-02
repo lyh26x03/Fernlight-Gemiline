@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+gunicorn
+pydantic
+python-dotenv
+line-bot-sdk
+google-generativeai>=0.8.0
+gradio
+requests
