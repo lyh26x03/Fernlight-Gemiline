@@ -1,7 +1,6 @@
-Fernlight: Gemiline · LINE Bot (FastAPI × Google Gemini)
+# Fernlight: Gemiline · LINE Bot (FastAPI × Google Gemini)
 
 一個溫柔的小天使 LINE 機器人：用 FastAPI 做 webhook、Google Gemini 生成回覆，部署在 Hugging Face Spaces。
-目標很務實：穩、清楚、好維運；先把基礎打好，再慢慢長大。
 
 特色 Highlights
 
@@ -41,27 +40,27 @@ DEFALUT_TALKING	（選用）true/false，控制是否回覆使用者（預設 tr
 注意：變數名沿用現有程式中的拼字（DEFALUT_TALKING）。
 
 本地開發（快速開始）
-# 1) 安裝
+## 1) 安裝
 pip install -r requirements.txt
 
-# 2) 設定環境變數（舉例：Linux/macOS）
+## 2) 設定環境變數（舉例：Linux/macOS）
 export GOOGLE_API_KEY=xxx
 export CHANNEL_ACCESS_TOKEN=xxx
 export CHANNEL_SECRET=xxx
 
-# 3) 啟動
+## 3) 啟動
 uvicorn main:app --host 0.0.0.0 --port 7860 --reload
 
 
 本地測試：
 
-# 健康檢查
+### 健康檢查
 curl http://localhost:7860/health
-# 診斷資訊（會回傳模型與是否有 key）
+### 診斷資訊（會回傳模型與是否有 key）
 curl http://localhost:7860/diag
-# 可用路由
+### 可用路由
 curl http://localhost:7860/routes
-# 快速測 LLM
+### 快速測 LLM
 curl http://localhost:7860/test_llm
 
 
