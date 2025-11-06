@@ -1,7 +1,6 @@
-# Fernlight: Gemiline · LINE Bot (FastAPI × Google Gemini)
+# Fernlight : Gemiline · LINE Bot (FastAPI × Google Gemini)
 
 一個溫柔的小天使 LINE 機器人：用 FastAPI 做 webhook、Google Gemini 生成回覆，部署在 Hugging Face Spaces。  
-目標務實：**穩、清楚、好維運**；先把基礎打好，再慢慢長大。
 
 ---
 
@@ -19,10 +18,11 @@
 ---
 
 ## 🧱 架構 Architecture
+```javascript
 LINE User ──(Webhook)──> FastAPI (/webhook)
                       ├─ /health /diag /routes /test_llm
                       └─ llm.py (Google Generative AI SDK, gemini-2.5-flash)
-
+```
 Secrets:
 - GOOGLE_API_KEY
 - CHANNEL_ACCESS_TOKEN
@@ -32,7 +32,7 @@ Deploy:
 - Hugging Face Spaces（可選 GitHub Actions 自動推送）
 
 ### 目錄結構（示意）
-.
+```javascript
 ├─ main.py                # FastAPI + LINE Webhook
 ├─ llm.py                 # LLM 呼叫封裝（Gemini）
 ├─ requirements.txt
@@ -40,7 +40,7 @@ Deploy:
 └─ .github/
    └─ workflows/
       └─ deploy-to-hf.yml # （選用）自動部署至 Hugging Face
-
+```
 ---
 
 ## 🔐 環境變數
@@ -57,57 +57,52 @@ Deploy:
 
 ## 🧪 本地開發（快速開始）
 
-# 1) 安裝依賴
+### 1) 安裝依賴
+```other
 pip install -r requirements.txt
-
-# 2) 設定環境變數（舉例：Linux/macOS）
+```
+### 2) 設定環境變數（舉例：Linux/macOS）
+```other
 export GOOGLE_API_KEY=xxx
 export CHANNEL_ACCESS_TOKEN=xxx
 export CHANNEL_SECRET=xxx
-
-# 3) 啟動
+```
+### 3) 啟動
+```other
 uvicorn main:app --host 0.0.0.0 --port 7860 --reload
-
+```
 本地檢查：
-
-
+```other
 curl http://localhost:7860/health     # 健康檢查
 curl http://localhost:7860/diag       # 模型與金鑰檢查
 curl http://localhost:7860/routes     # 可用路由
 curl http://localhost:7860/test_llm   # 快速測 LLM
-
+```
 設定 LINE Webhook（開發期可用 ngrok 轉址）：
+- LINE Developers > Messaging API > Webhook URL 設為 https://你的公開網址/webhook
+- 記得 啟用 Webhook，並將 bot 加為好友。
 
-LINE Developers > Messaging API > Webhook URL 設為 https://你的公開網址/webhook
+## 部署到 Hugging Face Spaces
 
-記得 啟用 Webhook，並將 bot 加為好友。
+- 在 Space 的「Settings → Secrets」設定與上方相同的三個變數。
+- 若要 **GitHub Actions 自動部署**，可新增 workflow（需 `HF_TOKEN`、`HF_SPACE_ID`）：
+   - `HF_SPACE_ID` 例：`lyh26x03/Fernlight-Gemiline`
+   - `HF_TOKEN` 到 HF 右上角 Tokens 產生，至少有寫入 Space 權限。
 
-🚀 部署到 Hugging Face Spaces
-在 Space 的 Settings → Secrets 設定與上方相同的三個變數。
+> 目前我採「GitHub 為主倉」→（選擇性）自動推送到新建的 HF Space。
 
-若要 GitHub Actions 自動部署，可新增 workflow（需 HF_TOKEN、HF_SPACE_ID）：
+> 若早期是從別人 Space fork，已將內容整理到自有倉庫，避免權限/同步混亂。
 
-HF_SPACE_ID 範例：lyh26x03/Fernlight-Gemiline
+## 已知限制 & 後續規劃
 
-HF_TOKEN 於 HF 右上角產生個人存取權杖（需具備寫入 Space 權限）
+- 目前為 Demo 級：無資料庫、無使用者狀態持久化。
+- **Roadmap**
+   - 心情日記（Mood Journal）：紀錄/標籤/回顧（DB + Flex Message）。
+   - Rich Menu / Quick Replies：更友善的功能入口。
+   - 觀測：請求指標、錯誤率、簡單儀表板。
+   - 測試：單元測試（llm/handlers）、webhook 端到端測試。
+   - 降級策略：429/5xx 重試與退避、替代模型或回覆模板。
 
-本專案採 GitHub 為主倉 →（選用）自動推送到新建的 HF Space。
-若早期源自教學 Space，已整理為自有倉庫，避免權限/同步混亂。
+## 致謝 Credits
 
-🗺️ 已知限制 & 後續規劃
-目前為 Demo 級：尚無資料庫、無使用者狀態持久化。
-
-Roadmap
-
-心情日記（Mood Journal）：紀錄/標籤/回顧（DB + Flex Message）
-
-Rich Menu / Quick Replies：更友善的功能入口
-
-觀測：請求指標、錯誤率、簡單儀表板
-
-測試：單元測試（llm/handlers）、webhook 端到端測試
-
-降級策略：429/5xx 重試與退避、替代模型或回覆模板
-
-🙏 Credits
-本專案靈感與早期結構來自教學範例，後續改造為自有倉庫與部署流程；如引用他人程式片段，已在註解與文件中標註來源。
+本專案靈感與早期結構來自教學範例，後續改造為自有倉庫與部署流程。
