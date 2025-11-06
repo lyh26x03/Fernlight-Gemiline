@@ -9,7 +9,7 @@
 - **護欄 Guardrails**  
   - 溫度/長度設定、請求逾時（timeout）、錯誤保底訊息。  
   - 僅處理文字訊息，其他事件回固定提示。  
-- **觀測 Observability**：`/health`、`/diag`、`/routes`、`/test_llm` 便於排錯與驗證金鑰；stdout 結構化 log。  
+- **觀測 Observability**：`/health`、`/diag`、`/test_llm` 便於排錯與驗證金鑰；stdout 結構化 log。  
 - **降級 Degradation**：LLM 出錯時提供親切的 fallback，不讓對話中斷。  
 - **測試 Quick checks**：`/test_llm` 一鍵檢查 key/模型/網路是否可用。  
 
@@ -20,7 +20,7 @@
 ## 🧱 架構 Architecture
 ```javascript
 LINE User ──(Webhook)──> FastAPI (/webhook)
-                      ├─ /health /diag /routes /test_llm
+                      ├─ /health /diag /test_llm
                       └─ llm.py (Google Generative AI SDK, gemini-2.5-flash)
 ```
 Secrets:
