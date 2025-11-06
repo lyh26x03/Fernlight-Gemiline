@@ -4,8 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
-
-# ✨ 新增：只從 llm.py 匯入
 from llm import call_llm, list_model_ids, MODEL_ID
 
 GOOGLE_API_KEY = os.environ["GOOGLE_API_KEY"]
