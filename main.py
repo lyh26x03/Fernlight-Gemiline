@@ -6,6 +6,7 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
 from llm import call_llm, list_model_ids, MODEL_ID
 
+# ---- 基本護欄與友善降級訊息 ----
 MAX_INPUT_LEN = 800
 FALLBACKS = {
     "TIMEOUT": "我想太久了，先給你短答～可以換個說法或等我再試一次 ✨",
@@ -18,14 +19,18 @@ FALLBACKS = {
     "_DEFAULT": "剛剛卡住了，我們再試一次吧 🙏"
 }
 
+# ---- 環境變數 ----
 GOOGLE_API_KEY = os.environ["GOOGLE_API_KEY"]
 CHANNEL_ACCESS_TOKEN = os.environ["CHANNEL_ACCESS_TOKEN"]
 CHANNEL_SECRET = os.environ["CHANNEL_SECRET"]
 
+# ---- LINE SDK ----
 line_bot_api = LineBotApi(CHANNEL_ACCESS_TOKEN)
 line_handler = WebhookHandler(CHANNEL_SECRET)
-working_status = os.getenv("DEFALUT_TALKING", "true").lower() == "true"
+# 修正拼字 + 兼容舊變數名
+working_status = os.getenv("DEFAULT_TALKING", os.getenv("DEFALUT_TALKING", "true")).lower() == "true"
 
+# ---- FastAPI App 與 CORS ----
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -72,18 +77,40 @@ async def webhook(request: Request, background_tasks: BackgroundTasks, x_line_si
 @line_handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     global working_status
+
+    # 只收文字
     if event.type != "message" or event.message.type != "text":
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="只接受文字訊息"))
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="目前只接受文字訊息喔～"))
         return
 
-    if event.message.text.strip() == "再見":
+    # 基本護欄：空白/長度
+    user_text = (event.message.text or "").strip()
+    if not user_text:
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="可以再多說一點嗎？"))
+        return
+
+    if len(user_text) > MAX_INPUT_LEN:
+        user_text = user_text[:MAX_INPUT_LEN] + "…（已截斷過長訊息）"
+
+    # 簡單指令例
+    if user_text == "再見":
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="Bye!"))
         return
 
-    if working_status:
-        try:
-            out = call_llm(event.message.text) or "Gemini沒答案!請換個說法！"
-        except Exception:
-            print("[LLM ERROR]", traceback.format_exc(), flush=True)
-            out = "Gemini執行出錯!請換個說法！"
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=out))
+    if not working_status:
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="我現在休息一下，等等再聊～"))
+        return
+
+    # 呼叫 LLM + 友善降級
+    try:
+        out = call_llm(user_text) or "EMPTY_RESPONSE"
+        if out == "EMPTY_RESPONSE":
+            raise RuntimeError("EMPTY_RESPONSE")
+    except Exception as e:
+        label = str(e)
+        # 依錯誤標籤選擇 fallback（TIMEOUT / QUOTA_EXCEEDED / …）
+        msg = next((v for k, v in FALLBACKS.items() if k != "_DEFAULT" and label.startswith(k)), FALLBACKS["_DEFAULT"])
+        print("[LLM ERROR]", label, flush=True)
+        out = msg
+
+    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=out))
