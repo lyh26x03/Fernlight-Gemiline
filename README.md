@@ -44,14 +44,12 @@ Deploy:
 ---
 
 ## 🔐 環境變數
-| 變數 | 說明 |
-|---|---|
-| `GOOGLE_API_KEY` | Google Generative AI API 金鑰 |
-| `CHANNEL_ACCESS_TOKEN` | LINE Messaging API Channel access token |
-| `CHANNEL_SECRET` | LINE Channel secret |
-| `DEFALUT_TALKING` | （選用）`true/false` 控制是否回覆使用者（預設 `true`） |
-
-> 注意拼字：變數名沿用現有程式中的 `DEFALUT_TALKING`（若未來改程式再一併修正）。
+| 變數                  | 說明 |
+|-----------------------|------|
+| `GOOGLE_API_KEY`      | Google Generative AI API 金鑰 |
+| `CHANNEL_ACCESS_TOKEN`| LINE Messaging API Channel access token |
+| `CHANNEL_SECRET`      | LINE Channel secret |
+| `DEFAULT_TALKING`     | （選用）`true/false` 是否回覆使用者（**建議使用**） |
 
 ---
 
@@ -75,7 +73,6 @@ uvicorn main:app --host 0.0.0.0 --port 7860 --reload
 ```other
 curl http://localhost:7860/health     # 健康檢查
 curl http://localhost:7860/diag       # 模型與金鑰檢查
-curl http://localhost:7860/routes     # 可用路由
 curl http://localhost:7860/test_llm   # 快速測 LLM
 ```
 設定 LINE Webhook（開發期可用 ngrok 轉址）：
