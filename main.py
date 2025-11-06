@@ -6,6 +6,19 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
 from llm import call_llm, list_model_ids, MODEL_ID
 
+# ===== (A) 檔頭 import 下方，設定友善 fallback 與基本參數 =====
+MAX_INPUT_LEN = 800
+FALLBACKS = {
+    "TIMEOUT": "我想太久了，先給你短答～可以換個說法或等我再試一次 ✨",
+    "QUOTA_EXCEEDED": "今天有點忙（額度滿了），等一下再問我一次好嗎？",
+    "MODEL_NOT_FOUND": "目前模型設定怪怪的，我會請管理者檢查一下。",
+    "PERMISSION_DENIED_API_OR_KEY": "金鑰或權限可能有誤，我會請管理者處理。",
+    "BAD_REQUEST_PAYLOAD": "我不太確定你的說法格式，能換個方式描述嗎？",
+    "EMPTY_RESPONSE": "我暫時沒有好答案，能否換個問法？",
+    "GOOGLE_API_ERROR": "和模型連線遇到小狀況，我們再試試看。",
+    "_DEFAULT": "剛剛卡住了，我們再試一次吧 🙏"
+}
+
 GOOGLE_API_KEY = os.environ["GOOGLE_API_KEY"]
 CHANNEL_ACCESS_TOKEN = os.environ["CHANNEL_ACCESS_TOKEN"]
 CHANNEL_SECRET = os.environ["CHANNEL_SECRET"]
