@@ -6,7 +6,6 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
 from llm import call_llm, list_model_ids, MODEL_ID
 
-# ===== (A) 檔頭 import 下方，設定友善 fallback 與基本參數 =====
 MAX_INPUT_LEN = 800
 FALLBACKS = {
     "TIMEOUT": "我想太久了，先給你短答～可以換個說法或等我再試一次 ✨",
