@@ -29,7 +29,7 @@ Secrets:
 - CHANNEL_SECRET
 
 Deploy:
-- Hugging Face Spaces（可選 GitHub Actions 自動推送）
+- Hugging Face Spaces
 
 ### 目錄結構（示意）
 ```javascript
@@ -86,7 +86,7 @@ curl http://localhost:7860/test_llm   # 快速測 LLM
    - `HF_SPACE_ID` 例：`lyh26x03/Fernlight-Gemiline`
    - `HF_TOKEN` 到 HF 右上角 Tokens 產生，至少有寫入 Space 權限。
 
-> 目前我採「GitHub 為主倉」→（選擇性）自動推送到新建的 HF Space。
+> 目前我採「GitHub 為主倉」
 
 > 若早期是從別人 Space fork，已將內容整理到自有倉庫，避免權限/同步混亂。
 
@@ -103,3 +103,4 @@ curl http://localhost:7860/test_llm   # 快速測 LLM
 ## 致謝 Credits
 
 本專案靈感與早期結構來自教學範例，後續改造為自有倉庫與部署流程。
+https://huggingface.co/spaces/alanchen1115/gemiline
